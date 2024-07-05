@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Practica Parcial</title>
+    <link rel="stylesheet" href="Style.css">
+
+</head>
+
+<body>
+
+    <div id="loading-contenedor">
+        <div id="loading">
+            <img src="./loading.gif" alt="Cargando">
+        </div>
+    </div>
+
+
+
+    <div class="contenedorGrid" id="contenedorGrid">
+        <div class="contenedor">
+            <div class="contenedor"><b>Form Datos<br></b>
+            </div>
+            <table class="tablaDatos" id="tablaDatos">
+                <thead>
+                    <tr>
+                        <th><button class="orden">ID</button></th>
+                        <th><button class="orden">Nombre</button></th>
+                        <th><button class="orden">Apellido</button></th>
+                        <th><button class="orden">Edad</button></th>
+                        <th class="colEliminar"><button class="orden">Modificar</button></th>
+                        <th class="colEliminar"><button class="orden">Eliminar</button></th>
+                    </tr>
+                </thead>
+                <tbody id="itemsTabla">
+                </tbody>
+            </table>
+            <button id="botonAgregarGrid">Agregar Elemento</button>
+        </div>
+    </div>
+    </div>
+
+
+    <div class="FormAgregar" id="FormAgregar">
+        <h2><b>Formulario ABM</b><br></h2>
+        <label>id:</label><input type="text" name="inputId" readonly /><br>
+        <label>Nombre:</label><input type="text" name="inputNombre" /><br>
+        <label>Apellido:</label><input type="text" name="inputApellido" /><br>
+        <label>Edad:</label><input type="text" name="inputEdad" /><br><label> Tipo:</label><select id="TipoSelect">
+            <option value="Empleado" id="opABMEmpleado">Empleado</option>
+            <option value="Cliente" id="opABMCliente">Cliente</option>
+        </select><br>
+
+        <label id="lbl1">Ventas</label><input type="text" name="inp1" /><br>
+        <label id="lbl2">Sueldo</label><input type="text" name="inp2" /><br>
+
+        <button id="botonAceptarABM">Aceptar</button>
+        <button id="botonModificar">Modificar</button>
+        <button id="botonEliminar">Eliminar</button>
+        <button id="botonCancelar">Cancelar</button>
+    </div>
+
+    <div class="gridEncabezados" id="grid1"></div>
+    <script src="baseDatos.js"></script>
+</body>
+
+</html>
