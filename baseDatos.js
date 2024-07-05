@@ -12,52 +12,36 @@ class Persona {
     }
 }
 
-class Empleado extends Persona {
+class Ciudadano extends Persona {
 
-    constructor(id, nombre, apellido, edad, sueldo, ventas) {
+    constructor(id, nombre, apellido, fechaNacimiento, dni) {
 
-        super(id, nombre, apellido, edad);
+        super(id, nombre, apellido, fechaNacimiento);
 
-        if ((ventas > 0 && ventas !== null) && (sueldo > 0 && sueldo !== null)) {
-            this.ventas = ventas;
-            this.sueldo = sueldo;
+        if (dni > 0) {
+            this.dni = dni;
         }
     }
 
     ToString() {
-        return `${super.ToString()},Ventas: ${this.ventas},Sueldo:${this.sueldo}`;
+        return `${super.ToString()},Fecha de nacimiento:${this.fechaNacimiento}}`;
     }
-    ToJson() {
-        return {
-            ...super.ToJson(),
-            ventas: this.ventas,
-            sueldo: this.sueldo,
-        };
-    }
+
 }
 
 
-class Cliente extends Persona {
-    constructor(id, nombre, apellido, edad, compras, telefono) {
+class Extranjero extends Persona {
+    constructor(id, nombre, apellido, fechaNacimiento, paisOrigen) {
 
-        super(id, nombre, apellido, edad);
+        super(id, nombre, apellido, fechaNacimiento);
 
-        if (telefono != null) {
-            this.compras = compras;
-            this.telefono = telefono;
+        if (paisOrigen != null) {
+            this.paisOrigen = paisOrigen;
         }
     }
-
     ToString() {
 
-        return `${super.ToString()},Compras: ${this.compras}telefono: ${this.telefono}`;
-    }
-    ToJson() {
-        return {
-            ...super.ToJson(),
-            telefono: this.telefono,
-            compras: this.compras,
-        };
+        return `${super.ToString()},Pais origen: ${this.paisOrigen}`;
     }
 }
 
@@ -75,17 +59,14 @@ formABM.style.display = "none";
 inputID = document.getElementsByName("inputId");
 inputNombre = document.getElementsByName("inputNombre");
 inputApellido = document.getElementsByName("inputApellido");
-inputEdad = document.getElementsByName("inputEdad");
+inputFechaNacimiento = document.getElementsByName("inputEdad");
 
 inp1 = document.getElementsByName("inp1");
 lbl1 = document.getElementById("lbl1");
 
-inp2 = document.getElementsByName("inp2");
-lbl2 = document.getElementById("lbl2");
 inputSelect = document.getElementById("TipoSelect");
 
 botonAceptarAbm = document.getElementById("botonAceptarABM");
-
 //Tabla
 function BorrarDatosTabla() {
     const filas = tablaDatos.querySelectorAll("tr:not(:first-child)");
@@ -95,6 +76,52 @@ function BorrarDatosTabla() {
 }
 
 //ABM
+function ValidarDatosAbm() {
+
+    console.log(inputSelect.value);
+    if ((inputNombre[0].value) === null || inputNombre[0].value.trim() === "" || isNaN(inputNombre[0].value) === false) {
+        alert("Debe indicar un nombre valido");
+        return false;
+    }
+    if ((inputApellido[0].value) === null || inputApellido[0].value.trim() === "" || isNaN(inputApellido[0].value) === false) {
+        alert("Debe indicar un apellidovalido ");
+        return false;
+    }
+    if (isNaN(inputFechaNacimiento[0].value)) {
+        alert("Debe indicar un una fecha de nacimiento en valor numerico");
+        return false;
+    }
+
+    if (inputFechaNacimiento[0].value === null) {
+        alert("Debe indicar una fecha de nacimiento");
+        return false;
+    }
+    switch (inputSelect.value) {
+        case "Ciudadano":
+            if (isNaN(inp1[0].value)) {
+                alert("Debe indicar un dni en valor numerico");
+                return false;
+            }
+
+            if (parseInt(inp1[0].value) < 0) {
+                alert("Debe indicar un dni mayor a 0");
+                return false;
+            }
+            if (inp1[0].value === null || inp1[0].value.trim() === "") {
+                alert("Debe indicar un dni");
+                return false;
+            }
+
+            break;
+        case "Extranjero":
+            if ((inp1[0].value) == null) {
+                alert("Debe ingresar un dato");
+                return false;
+            }
+            break;
+    }
+    return true;
+}
 function MostrarFormAbm() {
     contenedorGrid.style.display = "none"
     formABM.style.display = "block";
@@ -102,24 +129,29 @@ function MostrarFormAbm() {
     botonModificar.style.display = "none";
 }
 
+function cambiarEstadoCamposAbm(bool) {
+    inp1[0].disabled = bool;
+    inputNombre[0].disabled = bool;
+    inputApellido[0].disabled = bool;
+    inputFechaNacimiento[0].disabled = bool;
+
+}
 function obtenerDatosFormAbm() {
 
     let id = inputID[0].value;
     let nombre = inputNombre[0].value;
     let apellido = inputApellido[0].value;
-    let edad = inputEdad[0].value;
+    let fechaNacimiento = inputFechaNacimiento[0].value;
     let tipoPersona = inputSelect.value;
 
     let persona;
 
-    if (tipoPersona === "Cliente") {
-        let telefono = inp1[0].value;
-        let compras = inp2[0].value;
-        persona = new Cliente(parseInt(id), nombre, apellido, parseInt(edad), parseInt(compras), parseInt(telefono));
+    if (tipoPersona === "Ciudadano") {
+        let dni = inp1[0].value;
+        persona = new Ciudadano(parseInt(id), nombre, apellido, parseInt(fechaNacimiento), parseInt(dni));
     } else {
-        let ventas = inp1[0].value;
-        let sueldo = inp2[0].value;
-        persona = new Empleado(parseInt(id), nombre, apellido, parseInt(edad), parseInt(sueldo), parseInt(ventas));
+        let paisOrigen = inp1[0].value;
+        persona = new Extranjero(parseInt(id), nombre, apellido, parseInt(fechaNacimiento), paisOrigen);
     }
 
     return persona;
@@ -127,9 +159,8 @@ function obtenerDatosFormAbm() {
 function limpiarFormABM() {
     inputNombre[0].value = "";
     inputApellido[0].value = "";
-    inputEdad[0].value = "";
+    inputFechaNacimiento[0].value = "";
     inp1[0].value = "";
-    inp2[0].value = "";
     inputSelect.disabled = false;
 }
 function ocultarFormAbm() {
@@ -144,7 +175,7 @@ botonAgregarGrid.addEventListener("click", function () {
     botonAceptarAbm.removeEventListener("click", handlerModfPersona);
 
     botonAceptarAbm.addEventListener("click", handlerAltaPersona);
-
+    cambiarEstadoCamposAbm(false);
     limpiarFormABM();
     MostrarFormAbm();
 });
@@ -157,21 +188,17 @@ function cargarFormAbm(persona) {
     inputID[0].value = persona.id;
     inputNombre[0].value = persona.nombre;
     inputApellido[0].value = persona.apellido;
-    inputEdad[0].value = persona.edad;
+    inputFechaNacimiento[0].value = persona.fechaNacimiento;
 
-    if (persona instanceof Empleado) {
-        inputSelect.value = "Empleado";
-        lbl1.textContent = "Ventas";
-        inp1[0].value = persona.ventas;
-        lbl2.textContent = "Sueldo";
-        inp2[0].value = persona.sueldo;
+    if (persona instanceof Ciudadano) {
+        inputSelect.value = "Ciudadano";
+        lbl1.textContent = "DNI";
+        inp1[0].value = persona.dni;
 
     } else {
-        inputSelect.value = "Cliente";
-        inp1[0].value = persona.telefono;
-        lbl1.textContent = "Telefono";
-        inp2[0].value = persona.compras;
-        lbl2.textContent = "Compras";
+        inputSelect.value = "Extranjero";
+        inp1[0].value = persona.paisOrigen;
+        lbl1.textContent = "Pais origen";
     }
     inputSelect.disabled = true;
 }
@@ -184,7 +211,7 @@ function cargarPersonasTabla(array) {
         <td>${persona.id}</td>
         <td>${persona.nombre}</td>
         <td>${persona.apellido}</td>
-        <td>${persona.edad}</td>
+        <td>${persona.fechaNacimiento}</td>
         <td><button onclick="MostrarPersonaMod(this)">Modificar</button></td>
         <td><button onclick="MostrarPersonaElim(this)">Eliminar</button></td>
         `
@@ -199,6 +226,7 @@ function MostrarPersonaMod(button) {
     botonAceptarAbm.removeEventListener("click", handlerElimPersona);
 
     botonAceptarAbm.addEventListener("click", handlerModfPersona);
+    cambiarEstadoCamposAbm(false);
 
     let fila = button.parentElement.parentElement;
 
@@ -211,12 +239,15 @@ function MostrarPersonaMod(button) {
         MostrarFormAbm();
     }
 }
+
+
 function MostrarPersonaElim(button) {
 
     botonAceptarAbm.removeEventListener("click", handlerAltaPersona);
     botonAceptarAbm.removeEventListener("click", handlerModfPersona);
 
     botonAceptarAbm.addEventListener("click", handlerElimPersona);
+    cambiarEstadoCamposAbm(true);
 
     let fila = button.parentElement.parentElement;
 
@@ -231,31 +262,37 @@ function MostrarPersonaElim(button) {
 }
 
 function handlerAltaPersona() {
-    mostrarSpinner();
 
-    // Llamar a la función para agregar la persona
-    agregarPersona()
-        .then(() => {
-            // Ocultar el spinner si todo salió bien
-            ocultarSpinner();
-            alert("Se creó la persona con éxito");
-            ocultarFormAbm();
-        })
-        .catch(error => {
-            // Ocultar el spinner en caso de error y mostrar mensaje de error
-            ocultarSpinner();
-            console.error('Error:', error);
-            alert("No se pudo realizar la operación.");
-            ocultarFormAbm(); // Aquí decide si también quieres ocultar el formulario en caso de error
-        });
+    if (ValidarDatosAbm()) {
+        mostrarSpinner();
+        agregarPersona()
+            .then(() => {
+                ocultarSpinner();
+                alert("Se creó la persona con éxito");
+                ocultarFormAbm();
+            })
+            .catch(error => {
+
+                ocultarSpinner();
+                console.error('Error:', error);
+                alert("No se pudo realizar la operación.");
+                ocultarFormAbm();
+            });
+    }
+
+ 
 }
 
 async function handlerModfPersona() {
-    mostrarSpinner();
-    await modificarPersona();
-    ocultarFormAbm();
-    alert("Se modifico la persona con exito");
-    ocultarSpinner();
+
+    if (ValidarDatosAbm()) {
+        mostrarSpinner();
+        await modificarPersona();
+        ocultarFormAbm();
+        alert("Se modifico la persona con exito");
+        ocultarSpinner();
+    }
+
 }
 async function handlerElimPersona() {
     mostrarSpinner();
@@ -263,6 +300,7 @@ async function handlerElimPersona() {
     ocultarFormAbm();
     alert("Se elimino la persona con exito");
     ocultarSpinner();
+
 }
 
 function actualizarPersonaEnArray(persona) {
@@ -314,44 +352,63 @@ async function eliminarPersona() {
     }
 }
 
-async function modificarPersona() {
+function modificarPersona() {
 
     let persona = obtenerDatosFormAbm()
+    mostrarSpinner();
     // console.log(persona.nombre);
-    try {
-        const response = await fetch('https://examenesutn.vercel.app/api/PersonaCiudadanoExtranjero', {
-            method: 'POST',
+    return new Promise((resolve, reject) => {
+
+        fetch('https://examenesutn.vercel.app/api/PersonaCiudadanoExtranjero', {
+            method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(persona)
-        });
-        console.log('Request payload:', JSON.stringify(persona));
-        console.log("Persona:", persona.ToJson());
-        if (response.ok) {
-            const textResponse = await response.text();
-            console.log('Text response:', textResponse);
-            console.log(persona.id);
-            BorrarDatosTabla();
-            actualizarPersonaEnArray(persona);
-            cargarPersonasTabla(arrayPersonas);
-        } else {
-            console.warn("No se pudo realizar la operación:", response.statusText);
-        }
-    } catch (error) {
-        console.log("error");
-        //console.log(data);
-    }
+        })
+            .then(response => {
+
+                ocultarSpinner();
+
+                if (response.ok) {
+
+                    BorrarDatosTabla();
+                    actualizarPersonaEnArray(persona);
+                    cargarPersonasTabla(arrayPersonas);
+
+                    ocultarFormAbm();
+
+                    resolve(); 
+                } else {
+                    console.warn('No se pudo realizar la operación:', response.statusText);
+                    reject('No se pudo realizar la operación');
+                }
+            })
+            .catch(error => {
+                console.error('Error en la solicitud:', error);
+
+
+                ocultarSpinner();
+
+
+                console.warn('No se pudo realizar la operación:', error);
+                ocultarFormAbm();
+                reject('Error en la solicitud');
+            });
+    });
 }
+
 
 let gifBack = document.getElementById('loading-contenedor');
 //let formABM = document.getElementById("FormAgregar");
 
 
+
+
 function obtenerDatosXML() {
     mostrarSpinner();
     let xhr = new XMLHttpRequest();
-    xhr.open('GET', 'https://examenesutn.vercel.app/api/PersonaCiudadanoExtranjero', true);
+    xhr.open('GET', 'https://examenesutn.vercel.app/api/PersonaCiudadanoExtranjero', false);
 
     xhr.onload = function () {
         if (xhr.status === 200) {
@@ -359,12 +416,12 @@ function obtenerDatosXML() {
             personas = data;
 
             personas.forEach(element => {
-                if (element.hasOwnProperty('ventas')) {
-                    let empleado = new Empleado(element.id, element.nombre, element.apellido, element.edad, element.sueldo, element.ventas);
-                    arrayPersonas.push(empleado);
+                if (element.hasOwnProperty('dni')) {
+                    let ciudadano = new Ciudadano(element.id, element.nombre, element.apellido, element.fechaNacimiento, element.dni);
+                    arrayPersonas.push(ciudadano);
                 } else {
-                    let cliente = new Cliente(element.id, element.nombre, element.apellido, element.edad, element.compras, element.telefono);
-                    arrayPersonas.push(cliente);
+                    let extranjero = new Extranjero(element.id, element.nombre, element.apellido, element.fechaNacimiento, element.paisOrigen);
+                    arrayPersonas.push(extranjero);
                 }
             });
 
@@ -373,19 +430,17 @@ function obtenerDatosXML() {
         } else {
             console.warn("Error al obtener los datos:", xhr.statusText);
         }
-
         ocultarSpinner();
     };
 
     xhr.onerror = function () {
         console.error("Error en la solicitud:", xhr.statusText);
-        gifBack.style.display = "none"; // Asegurarse de ocultar el contenedor de carga en caso de error
+        gifBack.style.display = "none"; 
     };
 
     xhr.send();
 }
 console.log(arrayPersonas);
-
 
 
 obtenerDatosXML();
@@ -396,42 +451,38 @@ function agregarPersona() {
         inputID[0].value = "";
         let nombre = inputNombre[0].value;
         let apellido = inputApellido[0].value;
-        let edad = inputEdad[0].value;
+        let fechaNacimiento = inputFechaNacimiento[0].value;
         let tipoPersona = inputSelect.value;
         let id = 1;
         let persona;
 
-        if (tipoPersona === "Cliente") {
-            let telefono = inp1[0].value;
-            let compras = inp2[0].value;
-            persona = new Cliente(id, nombre, apellido, edad, compras, telefono);
+        if (tipoPersona === "Ciudadano") {
+            let dni = inp1[0].value;
+            persona = new Ciudadano(id, nombre, apellido, fechaNacimiento, dni);
         } else {
-            let ventas = inp1[0].value;
-            let sueldo = inp2[0].value;
-            persona = new Empleado(id, nombre, apellido, edad, sueldo, ventas);
+            let paisOrigen = inp1[0].value;
+            persona = new Extranjero(id, nombre, apellido, fechaNacimiento, paisOrigen);
         }
 
         let body = {};
-        if (tipoPersona === "Cliente") {
+        if (tipoPersona === "Ciudadano") {
             body = {
                 nombre: nombre,
                 apellido: apellido,
-                edad: edad,
-                compras: inp2[0].value,
-                telefono: inp1[0].value
+                fechaNacimiento: fechaNacimiento,
+                dni: inp1[0].value,
             };
-        } else if (tipoPersona === "Empleado") {
+        } else if (tipoPersona === "Extranjero") {
             body = {
                 nombre: nombre,
                 apellido: apellido,
-                edad: edad,
-                ventas: inp1[0].value,
-                sueldo: inp2[0].value
+                fechaNacimiento: fechaNacimiento,
+                paisOrigen: inp1[0].value
             };
         }
 
-        fetch('http://localhost:8080/PersonasEmpleadosClientes.php', {
-            method: 'PUT',
+        fetch('https://examenesutn.vercel.app/api/PersonaCiudadanoExtranjero', {
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -444,14 +495,14 @@ function agregarPersona() {
                 return response.json();
             })
             .then(data => {
-                let id = data.id; // Suponiendo que el servidor devuelve el ID creado
+                let id = data.id; 
                 body.id = id;
 
                 let persona;
-                if (tipoPersona === "Cliente") {
-                    persona = new Cliente(body.id, body.nombre, body.apellido, body.edad, body.compras, body.telefono);
-                } else if (tipoPersona === "Empleado") {
-                    persona = new Empleado(body.id, body.nombre, body.apellido, body.edad, body.sueldo, body.ventas);
+                if (tipoPersona === "Ciudadano") {
+                    persona = new Ciudadano(body.id, body.nombre, body.apellido, body.fechaNacimiento, body.dni);
+                } else if (tipoPersona === "Extranjero") {
+                    persona = new Extranjero(body.id, body.nombre, body.apellido, body.fechaNacimiento, body.paisOrigen);
                 }
                 BorrarDatosTabla();
                 arrayPersonas.push(persona);
@@ -473,56 +524,5 @@ function mostrarSpinner() {
 function ocultarSpinner() {
     gifBack.style.display = "none";
 }
-// botonAceptarAbm.addEventListener("click", function () {
-//     mostrarSpinner();
 
-//     // Llamar a la función para agregar la persona
-//     agregarPersona()
-//         .then(() => {
-//             // Ocultar el spinner si todo salió bien
-//             ocultarSpinner();
-//             alert("Se creó la persona con éxito");
-//             ocultarFormAbm();
-//         })
-//         .catch(error => {
-//             // Ocultar el spinner en caso de error y mostrar mensaje de error
-//             ocultarSpinner();
-//             console.error('Error:', error);
-//             alert("No se pudo realizar la operación.");
-//             ocultarFormAbm(); // Aquí decide si también quieres ocultar el formulario en caso de error
-//         });
-// });
-
-
-
-
-
-// async function obtenerDatosFetch() {
-//     let gifBack = document.getElementById('loading-contenedor');
-//     //let gif = document.getElementById('loading');
-//     try {
-//         // gif.style.display = "block";
-//         gifBack.style.display = "block";
-//         let response = await fetch('http://localhost:8080/PersonasEmpleadosClientes.php')
-//         let data = await response.json();
-//         personas = data;
-
-//         personas.forEach(element => {
-//             if (element.hasOwnProperty('ventas')) {
-//                 let empleado = new Empleado(element.id, element.nombre, element.apellido, element.edad, element.ventas, element.sueldo);
-//                 arrayPersonas.push(empleado);
-//             } else {
-//                 let cliente = new Cliente(element.id, element.nombre, element.apellido, element.edad, element.compras, element.telefono);
-//                 arrayPersonas.push(cliente);
-//             }
-//         });
-
-//         cargarPersonasTabla(arrayPersonas);
-//     } catch (error) {
-//         console.error('Error:', error);
-//     } finally {
-//         gifBack.style.display = "none";
-//         // gif.style.display = "none"
-//     }
-// }
 
