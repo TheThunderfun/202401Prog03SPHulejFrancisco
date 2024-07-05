@@ -280,7 +280,7 @@ function handlerAltaPersona() {
             });
     }
 
- 
+
 }
 
 async function handlerModfPersona() {
@@ -289,7 +289,6 @@ async function handlerModfPersona() {
         mostrarSpinner();
         await modificarPersona();
         ocultarFormAbm();
-        alert("Se modifico la persona con exito");
         ocultarSpinner();
     }
 
@@ -298,7 +297,6 @@ async function handlerElimPersona() {
     mostrarSpinner();
     await eliminarPersona();
     ocultarFormAbm();
-    alert("Se elimino la persona con exito");
     ocultarSpinner();
 
 }
@@ -342,9 +340,11 @@ async function eliminarPersona() {
             eliminarPersonaArray(idPersona);
             BorrarDatosTabla();
             cargarPersonasTabla(arrayPersonas);
+            alert("Se elimino la persona con exito");
+
         } else {
             console.warn('No se pudo realizar la operación:', response.statusText);
-            throw new Error('Error en la solicitud DELETE');
+            alert("No se puede eliminar al usuario");
         }
     } catch (error) {
         console.error('Error de red o servidor:', error);
@@ -377,8 +377,8 @@ function modificarPersona() {
                     cargarPersonasTabla(arrayPersonas);
 
                     ocultarFormAbm();
-
-                    resolve(); 
+                    alert("Se modifico la persona con exito");
+                    resolve();
                 } else {
                     console.warn('No se pudo realizar la operación:', response.statusText);
                     reject('No se pudo realizar la operación');
@@ -407,8 +407,12 @@ let gifBack = document.getElementById('loading-contenedor');
 
 function obtenerDatosXML() {
     mostrarSpinner();
+
+    //el spinner a veces funciona y otras no, si le agrego un setTimeOut a la funcion, funciona, pero no se si es una buena practica asi que lo deje asi :)
+
+    //setTimeout(()=>{
     let xhr = new XMLHttpRequest();
-    xhr.open('GET', 'https://examenesutn.vercel.app/api/PersonaCiudadanoExtranjero', false);
+    xhr.open('GET', 'https://examenesutn.vercel.app/api/PersonaCiudadanoExtranjero', true);
 
     xhr.onload = function () {
         if (xhr.status === 200) {
@@ -429,92 +433,90 @@ function obtenerDatosXML() {
 
         } else {
             console.warn("Error al obtener los datos:", xhr.statusText);
+            alert("No se pudo obtener los datos del servidor");
         }
         ocultarSpinner();
     };
 
     xhr.onerror = function () {
         console.error("Error en la solicitud:", xhr.statusText);
-        gifBack.style.display = "none"; 
+        ocultarSpinner();
     };
 
     xhr.send();
+    // },100);
 }
 console.log(arrayPersonas);
 
-
 obtenerDatosXML();
 
+handlerSpinner();
+async function agregarPersona() {
 
-function agregarPersona() {
-    return new Promise((resolve, reject) => {
-        inputID[0].value = "";
-        let nombre = inputNombre[0].value;
-        let apellido = inputApellido[0].value;
-        let fechaNacimiento = inputFechaNacimiento[0].value;
-        let tipoPersona = inputSelect.value;
-        let id = 1;
-        let persona;
+    inputID[0].value = "";
+    let nombre = inputNombre[0].value;
+    let apellido = inputApellido[0].value;
+    let fechaNacimiento = inputFechaNacimiento[0].value;
+    let tipoPersona = inputSelect.value;
+    let id = 1;
+    let persona;
 
-        if (tipoPersona === "Ciudadano") {
-            let dni = inp1[0].value;
-            persona = new Ciudadano(id, nombre, apellido, fechaNacimiento, dni);
-        } else {
-            let paisOrigen = inp1[0].value;
-            persona = new Extranjero(id, nombre, apellido, fechaNacimiento, paisOrigen);
-        }
+    if (tipoPersona === "Ciudadano") {
+        let dni = inp1[0].value;
+        persona = new Ciudadano(id, nombre, apellido, fechaNacimiento, dni);
+    } else {
+        let paisOrigen = inp1[0].value;
+        persona = new Extranjero(id, nombre, apellido, fechaNacimiento, paisOrigen);
+    }
 
-        let body = {};
-        if (tipoPersona === "Ciudadano") {
-            body = {
-                nombre: nombre,
-                apellido: apellido,
-                fechaNacimiento: fechaNacimiento,
-                dni: inp1[0].value,
-            };
-        } else if (tipoPersona === "Extranjero") {
-            body = {
-                nombre: nombre,
-                apellido: apellido,
-                fechaNacimiento: fechaNacimiento,
-                paisOrigen: inp1[0].value
-            };
-        }
+    let body = {};
+    if (tipoPersona === "Ciudadano") {
+        body = {
+            nombre: nombre,
+            apellido: apellido,
+            fechaNacimiento: fechaNacimiento,
+            dni: inp1[0].value,
+        };
+    } else if (tipoPersona === "Extranjero") {
+        body = {
+            nombre: nombre,
+            apellido: apellido,
+            fechaNacimiento: fechaNacimiento,
+            paisOrigen: inp1[0].value
+        };
+    }
+    try {
 
-        fetch('https://examenesutn.vercel.app/api/PersonaCiudadanoExtranjero', {
+        let response = await fetch('https://examenesutn.vercel.app/api/PersonaCiudadanoExtranjero', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(body)
         })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Error en la solicitud: ' + response.statusText);
-                }
-                return response.json();
-            })
-            .then(data => {
-                let id = data.id; 
-                body.id = id;
 
-                let persona;
-                if (tipoPersona === "Ciudadano") {
-                    persona = new Ciudadano(body.id, body.nombre, body.apellido, body.fechaNacimiento, body.dni);
-                } else if (tipoPersona === "Extranjero") {
-                    persona = new Extranjero(body.id, body.nombre, body.apellido, body.fechaNacimiento, body.paisOrigen);
-                }
-                BorrarDatosTabla();
-                arrayPersonas.push(persona);
-                cargarPersonasTabla(arrayPersonas);
+        if (!response.ok) {
+            throw new Error('Error en la solicitud: ' + response.statusText);
+        }
 
-                resolve();
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                reject(error);
-            });
-    });
+        const data = await response.json();
+        let id = data.id;
+
+        if (tipoPersona === "Ciudadano") {
+            persona = new Ciudadano(id, nombre, apellido, fechaNacimiento, body.dni);
+        } else {
+            persona = new Extranjero(id, nombre, apellido, fechaNacimiento, body.paisOrigen);
+        }
+        BorrarDatosTabla();
+        arrayPersonas.push(persona);
+        cargarPersonasTabla(arrayPersonas);
+
+        return Promise.resolve();
+
+    } catch (error) {
+        alert('Error:', error);
+        return Promise.reject(error); // Rechaza la promesa en caso de error
+    }
 }
 
 function mostrarSpinner() {
